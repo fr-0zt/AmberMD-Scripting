@@ -9,6 +9,28 @@
 # Description: Bash script for generating AMBER inputs for multiple trajectories
 ###########################################################
 
+# Cleanup function
+cleanup() {
+    local num_traj=$1
+    echo "Cleaning up old directories and files..."
+    rm -rf 001.min 002.heat
+    for ((traj=1; traj<=num_traj; traj++)); do
+        rm -rf "Traj${traj}"
+    done
+    echo "Cleanup done."
+}
+
+# Check if the first argument is "cleanup"
+if [ "$1" == "cleanup" ]; then
+    if [ $# -ne 2 ]; then
+        echo "Error: Cleanup requires the number of trajectories as the second argument."
+        echo "USAGE: $0 cleanup [NUMBER_OF_TRAJECTORIES]"
+        exit 1
+    fi
+    cleanup $2
+    exit 0
+fi
+
 # Usage message
 usage() {
     echo "USAGE: $0 [RESIDUE_START] [RESIDUE_END] [NUMBER_OF_TRAJECTORIES]"
@@ -34,7 +56,7 @@ fi
 residue_start=$1
 residue_end=$2
 number_of_trajectories=$3
-amber_restraints="restraintmask=\'(:$residue_start-$residue_end & !@H=)\'"
+amber_restraints="restraintmask='(:$residue_start-$residue_end & !@H=)'"
 echo "Writing scripts for $number_of_trajectories trajectories with ligand constraints for residues $residue_start to $residue_end."
 
 # Create directories for minimization and heating
