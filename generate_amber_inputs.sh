@@ -178,7 +178,8 @@ for ((traj=1; traj<=number_of_trajectories; traj++)); do
       skinnb=3.0,
      /
 
-    EOF
+EOF
+	
     echo "" >> Traj${traj}/003.equil/equil.in
 
     # Production script
@@ -195,6 +196,7 @@ for ((traj=1; traj<=number_of_trajectories; traj++)); do
        ntp=2, barostat=2,
      /
 
-    EOF
+EOF
+	
     echo "" >> Traj${traj}/004.prod/production.in
 done
