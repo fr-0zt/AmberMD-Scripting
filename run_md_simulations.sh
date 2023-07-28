@@ -24,7 +24,7 @@ usage() {
 if [ $# -lt 3 ]; then
     usage
 else
-    echo "Running MD Simulations..."
+    echo "$(date): Running MD Simulations..."
 fi
 
 # Set variables based on the arguments
@@ -36,15 +36,50 @@ md_start=$5
 md_stop=$6
 trajectory_number=$7
 
+# Log variable values
+echo "System name: $system_name"
+echo "Number of CPU cores: $cpu_cores"
+echo "Simulation type: $simulation_type"
+
 # Function for preproduction run
 preproduction_run() {
     # Minimize the system's energy with constraints decreasing over time.
+    echo "$(date): Starting first minimization stage..."
     mpirun -np $cpu_cores pmemd.MPI -O -p $system_name.parm7 -c $system_name.rst7 -i 001.min/minimize.in -o 001.min/min.log -inf 001.min/$system_name-min.info -x 001.min/$system_name-min.nc -r 001.min/$system_name-min.rst -ref $system_name.rst7
+    if [ $? -eq 0 ]; then
+        echo "$(date): First minimization completed successfully."
+    else
+        echo "$(date): First minimization failed. Check the log file for details."
+        exit 1
+    fi
+    
+    echo "$(date): Starting second minimization stage..."
     mpirun -np $cpu_cores pmemd.MPI -O -p $system_name.parm7 -c 001.min/$system_name-min.rst -i 001.min/minimize2.in -o 001.min/min2.log -inf 001.min/$system_name-min2.info -x 001.min/$system_name-min2.nc -r 001.min/$system_name-min2.rst -ref 001.min/$system_name-min.rst
+    if [ $? -eq 0 ]; then
+        echo "$(date): Second minimization completed successfully."
+    else
+        echo "$(date): Second minimization failed. Check the log file for details."
+        exit 1
+    fi
 
     # Heat the system to 310K with constraints.
+    echo "$(date): Starting first heating stage..."
     mpirun -np $cpu_cores pmemd.MPI -O -p $system_name.parm7 -c 001.min/$system_name-min2.rst -i 002.heat/heat-with-constraints.in -o 002.heat/$system_name-heat.log -inf 002.heat/$system_name-heat.info -x 002.heat/$system_name-heat.nc -r 002.heat/$system_name-heat.rst -ref 001.min/$system_name-min2.rst
-    mpirun -np $cpu_cores pmemd.MPI -O -p $system_name.parm7 -c 002.heat/$system_name-heat.rst -i 002.heat/heat-with-constraints2.in -o 002.heat/$system_name-heat2.log -inf 002.heat/$system_name-heat2.info -x 002.heat/$system_name-heat2.nc -r 002.heat/$system_name-heat2.rst -ref 001.min/$system_name-heat.rst
+    if [ $? -eq 0 ]; then
+        echo "$(date): First heating completed successfully."
+    else
+        echo "$(date): First heating failed. Check the log file for details."
+        exit 1
+    fi
+
+    echo "$(date): Starting second heating stage..."
+    mpirun -np $cpu_cores pmemd.MPI -O -p $system_name.parm7 -c 002.heat/$system_name-heat.rst -i 002.heat/heat-with-constraints2.in -o 002.heat/$system_name-heat2.log -inf 002.heat/$system_name-heat2.info -x 002.heat/$system_name-heat2.nc -r 002.heat/$system_name-heat2.rst -ref 002.heat/$system_name-heat.rst
+    if [ $? -eq 0 ]; then
+        echo "$(date): Second heating completed successfully."
+    else
+        echo "$(date): Second heating failed. Check the log file for details."
+        exit 1
+    fi
 }
 
 # Function for production run

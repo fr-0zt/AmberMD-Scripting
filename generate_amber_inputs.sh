@@ -126,6 +126,7 @@ cat <<EOF > 002.heat/heat-with-constraints.in
   cut=10.0,
   ioutfm=1,
   ntxo=2,
+  iwrap=1,
   restraint_wt=10.0,
   $amber_restraints
  /
@@ -161,6 +162,7 @@ cat <<EOF > 002.heat/heat-with-constraints2.in
   cut=10.0,
   ioutfm=1,
   ntxo=2,
+  iwrap=1,
   restraint_wt=10.0,
   $amber_restraints
  /
@@ -184,14 +186,14 @@ for ((traj=1; traj<=number_of_trajectories; traj++)); do
 
     # Equilibration script
     cat <<EOF > Traj${traj}/003.equil/equil.in
-    # Equilibration 5ns at 310K
+    # Equilibration 1ns at 310K
      &cntrl
        imin=0, ntx=5, irest=1, 
        ntc=2, ntf=2, tol=0.0000001,
-       nstlim=2500000, ntt=3, gamma_ln=1.0,
+       nstlim=500000, ntt=3, gamma_ln=1.0,
        temp0=310.0,
-       ntpr=2500, ntwr=10000, ntwx=2500,
-       dt=0.002, ig=-1,
+       ntpr=5000, ntwr=250000, ntwx=25000,
+       dt=0.002, ig=-1, iwrap=1,
        ntb=2, cut=10.0, ioutfm=1, ntxo=2,
        ntp=2,
      /
@@ -212,8 +214,8 @@ EOF
        ntc=2, ntf=2, tol=0.0000001,
        nstlim=5000000, ntt=3, gamma_ln=2.0,
        temp0=310.0,
-       ntpr=2500, ntwr=10000, ntwx=2500,
-       dt=0.002, ig=-1,
+       ntpr=5000, ntwr=2500000, ntwx=5000,
+       dt=0.002, ig=-1, iwrap=1,
        ntb=2, cut=10.0, ioutfm=1, ntxo=2,
        ntp=2, barostat=2,
      /
