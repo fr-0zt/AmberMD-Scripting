@@ -44,27 +44,18 @@ echo "Simulation type: $simulation_type"
 # Function for preproduction run
 preproduction_run() {
     # Minimize the system's energy with constraints decreasing over time.
-    echo "$(date): Starting first minimization stage..."
+    echo "$(date): Starting minimization stage..."
     mpirun -np $cpu_cores pmemd.MPI -O -p $system_name.parm7 -c $system_name.rst7 -i 001.min/minimize.in -o 001.min/min.log -inf 001.min/$system_name-min.info -x 001.min/$system_name-min.nc -r 001.min/$system_name-min.rst -ref $system_name.rst7
     if [ $? -eq 0 ]; then
-        echo "$(date): First minimization completed successfully."
+        echo "$(date): Minimization completed successfully."
     else
-        echo "$(date): First minimization failed. Check the log file for details."
-        exit 1
-    fi
-    
-    echo "$(date): Starting second minimization stage..."
-    mpirun -np $cpu_cores pmemd.MPI -O -p $system_name.parm7 -c 001.min/$system_name-min.rst -i 001.min/minimize2.in -o 001.min/min2.log -inf 001.min/$system_name-min2.info -x 001.min/$system_name-min2.nc -r 001.min/$system_name-min2.rst -ref 001.min/$system_name-min.rst
-    if [ $? -eq 0 ]; then
-        echo "$(date): Second minimization completed successfully."
-    else
-        echo "$(date): Second minimization failed. Check the log file for details."
+        echo "$(date): Minimization failed. Check the log file for details."
         exit 1
     fi
 
     # Heat the system to 310K with constraints.
     echo "$(date): Starting first heating stage..."
-    mpirun -np $cpu_cores pmemd.MPI -O -p $system_name.parm7 -c 001.min/$system_name-min2.rst -i 002.heat/heat-with-constraints.in -o 002.heat/$system_name-heat.log -inf 002.heat/$system_name-heat.info -x 002.heat/$system_name-heat.nc -r 002.heat/$system_name-heat.rst -ref 001.min/$system_name-min2.rst
+    mpirun -np $cpu_cores pmemd.MPI -O -p $system_name.parm7 -c 001.min/$system_name-min.rst -i 002.heat/heat-with-constraints.in -o 002.heat/$system_name-heat.log -inf 002.heat/$system_name-heat.info -x 002.heat/$system_name-heat.nc -r 002.heat/$system_name-heat.rst -ref $system_name.rst7
     if [ $? -eq 0 ]; then
         echo "$(date): First heating completed successfully."
     else
@@ -73,7 +64,7 @@ preproduction_run() {
     fi
 
     echo "$(date): Starting second heating stage..."
-    mpirun -np $cpu_cores pmemd.MPI -O -p $system_name.parm7 -c 002.heat/$system_name-heat.rst -i 002.heat/heat-with-constraints2.in -o 002.heat/$system_name-heat2.log -inf 002.heat/$system_name-heat2.info -x 002.heat/$system_name-heat2.nc -r 002.heat/$system_name-heat2.rst -ref 002.heat/$system_name-heat.rst
+    mpirun -np $cpu_cores pmemd.MPI -O -p $system_name.parm7 -c 002.heat/$system_name-heat.rst -i 002.heat/heat-with-constraints2.in -o 002.heat/$system_name-heat2.log -inf 002.heat/$system_name-heat2.info -x 002.heat/$system_name-heat2.nc -r 002.heat/$system_name-heat2.rst -ref $system_name.rst7
     if [ $? -eq 0 ]; then
         echo "$(date): Second heating completed successfully."
     else
@@ -86,20 +77,24 @@ preproduction_run() {
 production_run() {
     # Check if necessary arguments are available
     if [ -z "$gpu_index" ] || [ -z "$md_start" ] || [ -z "$md_stop" ] || [ -z "$trajectory_number" ]; then
-        echo "Please specify the GPU index, the starting MD run, the ending MD run, and the trajectory number."
+        echo "$(date): Missing arguments for production run."
         exit
     fi
 
     # Select a CUDA device and run NPT MD simulations until the target simulation length is reached (nmax+1).
     export CUDA_VISIBLE_DEVICES=$gpu_index
 
-    cd Traj${trajectory_number}/003.equil || { echo "Could not change to directory Traj${trajectory_number}/003.equil"; exit 1; }
+    cd Traj${trajectory_number}/003.equil || { echo "$(date): Could not change to directory Traj${trajectory_number}/003.equil"; exit 1; }
 
-
+    echo "$(date): Starting equilibration stage..."
     # Equilibrate the system with constraints.
-    mpirun -np $cpu_cores pmemd.MPI -O -p ../../$system_name.parm7 -c ../../002.heat/$system_name-heat2.rst -i equil.in -o $system_name-equil.log -inf $system_name-equil.info -x $system_name-equil.nc -r $system_name-equil.rst
+    mpirun -np $cpu_cores pmemd.MPI -O -p ../../$system_name.parm7 -c ../../002.heat/$system_name-heat2.rst -i equil.1.in -o $system_name-equil.1.log -inf $system_name-equil.1.info -x $system_name-equil.1.nc -r $system_name-equil.1.rst -ref ../../$system_name.rst7
+    mpirun -np $cpu_cores pmemd.MPI -O -p ../../$system_name.parm7 -c $system_name-equil.1.rst -i equil.2.in -o $system_name-equil.2.log -inf $system_name-equil.2.info -x $system_name-equil.2.nc -r $system_name-equil.2.rst -ref ../../$system_name.rst7
+    mpirun -np $cpu_cores pmemd.MPI -O -p ../../$system_name.parm7 -c $system_name-equil.2.rst -i equil.3.in -o $system_name-equil.3.log -inf $system_name-equil.3.info -x $system_name-equil.3.nc -r $system_name-equil.3.rst -ref ../../$system_name.rst7
+    mpirun -np $cpu_cores pmemd.MPI -O -p ../../$system_name.parm7 -c $system_name-equil.3.rst -i equil.4.in -o $system_name-equil.4.log -inf $system_name-equil.4.info -x $system_name-equil.4.nc -r $system_name-equil.4.rst
 
     cd ../004.prod
+    echo "$(date): Starting production stage..."
 
     # Production
     if [ $md_start == "0" ]; then
