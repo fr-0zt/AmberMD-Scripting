@@ -134,8 +134,8 @@ A NVT simulation for common production-level simulations
     ! Temperature control
     ntt=3,         ! Langevin dynamics
     gamma_ln=1.0,  ! Friction coefficient (ps^-1)
-    tempi=310,   ! Initial temp -- give it some small random velocities
-    temp0=310,   ! Target temperature
+    tempi=310,     ! Initial temp -- give it some small random velocities
+    temp0=310,     ! Target temperature
 
     ! Potential energy control
     cut=9.0,       ! nonbonded cutoff, in angstroms
@@ -193,7 +193,7 @@ A NVT simulation for common production-level simulations
     ! Temperature control
     ntt=3,         ! Langevin dynamics
     gamma_ln=1.0,  ! Friction coefficient (ps^-1)
-    temp0=310,   ! Target temperature
+    temp0=310,     ! Target temperature
 
     ! Potential energy control
     cut=9.0,       ! nonbonded cutoff, in angstroms
@@ -254,269 +254,269 @@ for ((traj=1; traj<=number_of_trajectories; traj++)); do
 
     # Equilibration script
     cat <<EOF > Traj${traj}/003.equil/equil.1.in
-	A NPT simulation for common production-level simulations
-	 &cntrl
-		imin=0,        ! No minimization
-		irest=1,       ! This IS a restart of an old MD simulation
-		ntx=5,         ! So our inpcrd file has velocities
+A NPT simulation for common production-level simulations
+ &cntrl
+	imin=0,        ! No minimization
+	irest=1,       ! This IS a restart of an old MD simulation
+	ntx=5,         ! So our inpcrd file has velocities
 
-		! Temperature control
-		ntt=3,         ! Langevin dynamics
-		gamma_ln=1.0,  ! Friction coefficient (ps^-1)
-		temp0=310,   ! Target temperature
+	! Temperature control
+	ntt=3,         ! Langevin dynamics
+	gamma_ln=1.0,  ! Friction coefficient (ps^-1)
+	temp0=310,     ! Target temperature
 
-		! Potential energy control
-		cut=9.0,       ! nonbonded cutoff, in angstroms
+	! Potential energy control
+	cut=9.0,       ! nonbonded cutoff, in angstroms
 
-		! MD settings
-		nstlim=125000, ! 125K steps, 125 ps total
-		dt=0.001,      ! time step (ps)
+	! MD settings
+	nstlim=125000, ! 125K steps, 125 ps total
+	dt=0.001,      ! time step (ps)
 
-		! SHAKE
-		ntc=2,         ! Constrain bonds containing hydrogen
-		ntf=2,         ! Do not calculate forces of bonds containing hydrogen
+	! SHAKE
+	ntc=2,         ! Constrain bonds containing hydrogen
+	ntf=2,         ! Do not calculate forces of bonds containing hydrogen
 
-		! Control how often information is printed
-		ntpr=1000,     ! Print energies every 1000 steps
-		ntwx=5000,     ! Print coordinates every 5000 steps to the trajectory
-		ntwr=10000,    ! Print a restart file every 10K steps (can be less frequent)
-	!   ntwv=-1,       ! Uncomment to also print velocities to trajectory
-	!   ntwf=-1,       ! Uncomment to also print forces to trajectory
-		ntxo=2,        ! Write NetCDF format
-		ioutfm=1,      ! Write NetCDF format (always do this!)
+	! Control how often information is printed
+	ntpr=1000,     ! Print energies every 1000 steps
+	ntwx=5000,     ! Print coordinates every 5000 steps to the trajectory
+	ntwr=10000,    ! Print a restart file every 10K steps (can be less frequent)
+!   ntwv=-1,       ! Uncomment to also print velocities to trajectory
+!   ntwf=-1,       ! Uncomment to also print forces to trajectory
+	ntxo=2,        ! Write NetCDF format
+	ioutfm=1,      ! Write NetCDF format (always do this!)
 
-		! Wrap coordinates when printing them to the same unit cell
-		iwrap=0,
+	! Wrap coordinates when printing them to the same unit cell
+	iwrap=0,
 
-		! Constant pressure control.
-		barostat=1,    ! Berendsen barostat... change to 2 for MC
-		ntp=3,         ! 1=isotropic, 2=anisotropic, 3=semi-isotropic w/ surften
-		pres0=1.0,     ! Target external pressure, in bar
-		taup=1.0,
+	! Constant pressure control.
+	barostat=1,    ! Berendsen barostat... change to 2 for MC
+	ntp=3,         ! 1=isotropic, 2=anisotropic, 3=semi-isotropic w/ surften
+	pres0=1.0,     ! Target external pressure, in bar
+	taup=1.0,
 
-		! Constant surface tension (needed for semi-isotropic scaling). Uncomment
-		! for this feature. csurften must be nonzero if ntp=3 above
-		csurften=3,    ! Interfaces in 1=yz plane, 2=xz plane, 3=xy plane
-		gamma_ten=0.0, ! Surface tension (dyne/cm). 0 gives pure semi-iso scaling
-		ninterface=2,  ! Number of interfaces (2 for bilayer)
+	! Constant surface tension (needed for semi-isotropic scaling). Uncomment
+	! for this feature. csurften must be nonzero if ntp=3 above
+	csurften=3,    ! Interfaces in 1=yz plane, 2=xz plane, 3=xy plane
+	gamma_ten=0.0, ! Surface tension (dyne/cm). 0 gives pure semi-iso scaling
+	ninterface=2,  ! Number of interfaces (2 for bilayer)
 
-		! Restraint options
-		ntr=1,         ! Positional restraints for proteins, sugars, ligands, and lipid head groups
+	! Restraint options
+	ntr=1,         ! Positional restraints for proteins, sugars, ligands, and lipid head groups
 
-		! Set water atom/residue names for SETTLE recognition
-		watnam='WAT',  ! Water residues are named WAT
-		owtnm='O',     ! Water oxygens are named O
-	 /
+	! Set water atom/residue names for SETTLE recognition
+	watnam='WAT',  ! Water residues are named WAT
+	owtnm='O',     ! Water oxygens are named O
+ /
 
-	 &wt
-		type='END'
-	 /
-	Membrane posres
-	1.0
-	FIND
-	P31 * * PC
-	SEARCH
-	RES $residue_start $residue_end
-	END
-	END
+ &wt
+	type='END'
+ /
+Membrane posres
+1.0
+FIND
+P31 * * PC
+SEARCH
+RES $residue_start $residue_end
+END
+END
 
 EOF
 	
     echo "" >> Traj${traj}/003.equil/equil.1.in
 	
 	cat <<EOF > Traj${traj}/003.equil/equil.2.in
-	A NPT simulation for common production-level simulations
-	 &cntrl
-		imin=0,        ! No minimization
-		irest=1,       ! This IS a restart of an old MD simulation
-		ntx=5,         ! So our inpcrd file has velocities
+A NPT simulation for common production-level simulations
+ &cntrl
+	imin=0,        ! No minimization
+	irest=1,       ! This IS a restart of an old MD simulation
+	ntx=5,         ! So our inpcrd file has velocities
 
-		! Temperature control
-		ntt=3,         ! Langevin dynamics
-		gamma_ln=1.0,  ! Friction coefficient (ps^-1)
-		temp0=310,   ! Target temperature
+	! Temperature control
+	ntt=3,         ! Langevin dynamics
+	gamma_ln=1.0,  ! Friction coefficient (ps^-1)
+	temp0=310,     ! Target temperature
 
-		! Potential energy control
-		cut=9.0,       ! nonbonded cutoff, in angstroms
+	! Potential energy control
+	cut=9.0,       ! nonbonded cutoff, in angstroms
 
-		! MD settings
-		nstlim=250000, ! 250K steps, 500 ps total
-		dt=0.002,      ! time step (ps)
+	! MD settings
+	nstlim=250000, ! 250K steps, 500 ps total
+	dt=0.002,      ! time step (ps)
 
-		! SHAKE
-		ntc=2,         ! Constrain bonds containing hydrogen
-		ntf=2,         ! Do not calculate forces of bonds containing hydrogen
+	! SHAKE
+	ntc=2,         ! Constrain bonds containing hydrogen
+	ntf=2,         ! Do not calculate forces of bonds containing hydrogen
 
-		! Control how often information is printed
-		ntpr=1000,     ! Print energies every 1000 steps
-		ntwx=5000,     ! Print coordinates every 5000 steps to the trajectory
-		ntwr=10000,    ! Print a restart file every 10K steps (can be less frequent)
-	!   ntwv=-1,       ! Uncomment to also print velocities to trajectory
-	!   ntwf=-1,       ! Uncomment to also print forces to trajectory
-		ntxo=2,        ! Write NetCDF format
-		ioutfm=1,      ! Write NetCDF format (always do this!)
+	! Control how often information is printed
+	ntpr=1000,     ! Print energies every 1000 steps
+	ntwx=5000,     ! Print coordinates every 5000 steps to the trajectory
+	ntwr=10000,    ! Print a restart file every 10K steps (can be less frequent)
+!   ntwv=-1,       ! Uncomment to also print velocities to trajectory
+!   ntwf=-1,       ! Uncomment to also print forces to trajectory
+	ntxo=2,        ! Write NetCDF format
+	ioutfm=1,      ! Write NetCDF format (always do this!)
 
-		! Wrap coordinates when printing them to the same unit cell
-		iwrap=0,
+	! Wrap coordinates when printing them to the same unit cell
+	iwrap=0,
 
-		! Constant pressure control.
-		barostat=1,    ! Berendsen barostat... change to 2 for MC
-		ntp=3,         ! 1=isotropic, 2=anisotropic, 3=semi-isotropic w/ surften
-		pres0=1.0,     ! Target external pressure, in bar
-		taup=1.0,
+	! Constant pressure control.
+	barostat=1,    ! Berendsen barostat... change to 2 for MC
+	ntp=3,         ! 1=isotropic, 2=anisotropic, 3=semi-isotropic w/ surften
+	pres0=1.0,     ! Target external pressure, in bar
+	taup=1.0,
 
-		! Constant surface tension (needed for semi-isotropic scaling). Uncomment
-		! for this feature. csurften must be nonzero if ntp=3 above
-		csurften=3,    ! Interfaces in 1=yz plane, 2=xz plane, 3=xy plane
-		gamma_ten=0.0, ! Surface tension (dyne/cm). 0 gives pure semi-iso scaling
-		ninterface=2,  ! Number of interfaces (2 for bilayer)
+	! Constant surface tension (needed for semi-isotropic scaling). Uncomment
+	! for this feature. csurften must be nonzero if ntp=3 above
+	csurften=3,    ! Interfaces in 1=yz plane, 2=xz plane, 3=xy plane
+	gamma_ten=0.0, ! Surface tension (dyne/cm). 0 gives pure semi-iso scaling
+	ninterface=2,  ! Number of interfaces (2 for bilayer)
 
-		! Restraint options
-		ntr=1,         ! Positional restraints for proteins, sugars, ligands, and lipid head groups
+	! Restraint options
+	ntr=1,         ! Positional restraints for proteins, sugars, ligands, and lipid head groups
 
-		! Set water atom/residue names for SETTLE recognition
-		watnam='WAT',  ! Water residues are named WAT
-		owtnm='O',     ! Water oxygens are named O
-	 /
+	! Set water atom/residue names for SETTLE recognition
+	watnam='WAT',  ! Water residues are named WAT
+	owtnm='O',     ! Water oxygens are named O
+ /
 
-	 &wt
-		type='END'
-	 /
-	Membrane posres
-	0.5
-	FIND
-	P31 * * PC
-	SEARCH
-	RES $residue_start $residue_end
-	END
-	END
+ &wt
+	type='END'
+ /
+Membrane posres
+0.5
+FIND
+P31 * * PC
+SEARCH
+RES $residue_start $residue_end
+END
+END
 
 EOF
 	
     echo "" >> Traj${traj}/003.equil/equil.2.in
 	
 	cat <<EOF > Traj${traj}/003.equil/equil.3.in
-	A NPT simulation for common production-level simulations
-	 &cntrl
-		imin=0,        ! No minimization
-		irest=1,       ! This IS a restart of an old MD simulation
-		ntx=5,         ! So our inpcrd file has velocities
+A NPT simulation for common production-level simulations
+ &cntrl
+	imin=0,        ! No minimization
+	irest=1,       ! This IS a restart of an old MD simulation
+	ntx=5,         ! So our inpcrd file has velocities
 
-		! Temperature control
-		ntt=3,         ! Langevin dynamics
-		gamma_ln=1.0,  ! Friction coefficient (ps^-1)
-		temp0=310,   ! Target temperature
+	! Temperature control
+	ntt=3,         ! Langevin dynamics
+	gamma_ln=1.0,  ! Friction coefficient (ps^-1)
+	temp0=310,     ! Target temperature
 
-		! Potential energy control
-		cut=9.0,       ! nonbonded cutoff, in angstroms
+	! Potential energy control
+	cut=9.0,       ! nonbonded cutoff, in angstroms
 
-		! MD settings
-		nstlim=250000, ! 250K steps, 500 ps total
-		dt=0.002,      ! time step (ps)
+	! MD settings
+	nstlim=250000, ! 250K steps, 500 ps total
+	dt=0.002,      ! time step (ps)
 
-		! SHAKE
-		ntc=2,         ! Constrain bonds containing hydrogen
-		ntf=2,         ! Do not calculate forces of bonds containing hydrogen
+	! SHAKE
+	ntc=2,         ! Constrain bonds containing hydrogen
+	ntf=2,         ! Do not calculate forces of bonds containing hydrogen
 
-		! Control how often information is printed
-		ntpr=1000,     ! Print energies every 1000 steps
-		ntwx=5000,     ! Print coordinates every 5000 steps to the trajectory
-		ntwr=10000,    ! Print a restart file every 10K steps (can be less frequent)
-	!   ntwv=-1,       ! Uncomment to also print velocities to trajectory
-	!   ntwf=-1,       ! Uncomment to also print forces to trajectory
-		ntxo=2,        ! Write NetCDF format
-		ioutfm=1,      ! Write NetCDF format (always do this!)
+	! Control how often information is printed
+	ntpr=1000,     ! Print energies every 1000 steps
+	ntwx=5000,     ! Print coordinates every 5000 steps to the trajectory
+	ntwr=10000,    ! Print a restart file every 10K steps (can be less frequent)
+!   ntwv=-1,       ! Uncomment to also print velocities to trajectory
+!   ntwf=-1,       ! Uncomment to also print forces to trajectory
+	ntxo=2,        ! Write NetCDF format
+	ioutfm=1,      ! Write NetCDF format (always do this!)
 
-		! Wrap coordinates when printing them to the same unit cell
-		iwrap=0,
+	! Wrap coordinates when printing them to the same unit cell
+	iwrap=0,
 
-		! Constant pressure control.
-		barostat=1,    ! Berendsen barostat... change to 2 for MC
-		ntp=3,         ! 1=isotropic, 2=anisotropic, 3=semi-isotropic w/ surften
-		pres0=1.0,     ! Target external pressure, in bar
-		taup=1.0,
+	! Constant pressure control.
+	barostat=1,    ! Berendsen barostat... change to 2 for MC
+	ntp=3,         ! 1=isotropic, 2=anisotropic, 3=semi-isotropic w/ surften
+	pres0=1.0,     ! Target external pressure, in bar
+	taup=1.0,
 
-		! Constant surface tension (needed for semi-isotropic scaling). Uncomment
-		! for this feature. csurften must be nonzero if ntp=3 above
-		csurften=3,    ! Interfaces in 1=yz plane, 2=xz plane, 3=xy plane
-		gamma_ten=0.0, ! Surface tension (dyne/cm). 0 gives pure semi-iso scaling
-		ninterface=2,  ! Number of interfaces (2 for bilayer)
+	! Constant surface tension (needed for semi-isotropic scaling). Uncomment
+	! for this feature. csurften must be nonzero if ntp=3 above
+	csurften=3,    ! Interfaces in 1=yz plane, 2=xz plane, 3=xy plane
+	gamma_ten=0.0, ! Surface tension (dyne/cm). 0 gives pure semi-iso scaling
+	ninterface=2,  ! Number of interfaces (2 for bilayer)
 
-		! Restraint options
-		ntr=1,         ! Positional restraints for proteins, sugars, ligands, and lipid head groups
+	! Restraint options
+	ntr=1,         ! Positional restraints for proteins, sugars, ligands, and lipid head groups
 
-		! Set water atom/residue names for SETTLE recognition
-		watnam='WAT',  ! Water residues are named WAT
-		owtnm='O',     ! Water oxygens are named O
-	 /
+	! Set water atom/residue names for SETTLE recognition
+	watnam='WAT',  ! Water residues are named WAT
+	owtnm='O',     ! Water oxygens are named O
+ /
 
-	 &wt
-		type='END'
-	 /
-	Membrane posres
-	0.1
-	FIND
-	P31 * * PC
-	SEARCH
-	RES $residue_start $residue_end
-	END
-	END
+ &wt
+	type='END'
+ /
+Membrane posres
+0.1
+FIND
+P31 * * PC
+SEARCH
+RES $residue_start $residue_end
+END
+END
 
 EOF
 	
     echo "" >> Traj${traj}/003.equil/equil.3.in
 	
 	cat <<EOF > Traj${traj}/003.equil/equil.4.in
-	A NPT simulation for common production-level simulations
-	 &cntrl
-		imin=0,        ! No minimization
-		irest=1,       ! This IS a restart of an old MD simulation
-		ntx=5,         ! So our inpcrd file has velocities
+A NPT simulation for common production-level simulations
+ &cntrl
+	imin=0,        ! No minimization
+	irest=1,       ! This IS a restart of an old MD simulation
+	ntx=5,         ! So our inpcrd file has velocities
 
-		! Temperature control
-		ntt=3,         ! Langevin dynamics
-		gamma_ln=1.0,  ! Friction coefficient (ps^-1)
-		temp0=310,   ! Target temperature
+	! Temperature control
+	ntt=3,         ! Langevin dynamics
+	gamma_ln=1.0,  ! Friction coefficient (ps^-1)
+	temp0=310,     ! Target temperature
 
-		! Potential energy control
-		cut=9.0,       ! nonbonded cutoff, in angstroms
+	! Potential energy control
+	cut=9.0,       ! nonbonded cutoff, in angstroms
 
-		! MD settings
-		nstlim=250000, ! 250K steps, 500 ps total
-		dt=0.002,      ! time step (ps)
+	! MD settings
+	nstlim=250000, ! 250K steps, 500 ps total
+	dt=0.002,      ! time step (ps)
 
-		! SHAKE
-		ntc=2,         ! Constrain bonds containing hydrogen
-		ntf=2,         ! Do not calculate forces of bonds containing hydrogen
+	! SHAKE
+	ntc=2,         ! Constrain bonds containing hydrogen
+	ntf=2,         ! Do not calculate forces of bonds containing hydrogen
 
-		! Control how often information is printed
-		ntpr=1000,     ! Print energies every 1000 steps
-		ntwx=5000,     ! Print coordinates every 5000 steps to the trajectory
-		ntwr=10000,    ! Print a restart file every 10K steps (can be less frequent)
-	!   ntwv=-1,       ! Uncomment to also print velocities to trajectory
-	!   ntwf=-1,       ! Uncomment to also print forces to trajectory
-		ntxo=2,        ! Write NetCDF format
-		ioutfm=1,      ! Write NetCDF format (always do this!)
+	! Control how often information is printed
+	ntpr=1000,     ! Print energies every 1000 steps
+	ntwx=5000,     ! Print coordinates every 5000 steps to the trajectory
+	ntwr=10000,    ! Print a restart file every 10K steps (can be less frequent)
+!   ntwv=-1,       ! Uncomment to also print velocities to trajectory
+!   ntwf=-1,       ! Uncomment to also print forces to trajectory
+	ntxo=2,        ! Write NetCDF format
+	ioutfm=1,      ! Write NetCDF format (always do this!)
 
-		! Wrap coordinates when printing them to the same unit cell
-		iwrap=0,
+	! Wrap coordinates when printing them to the same unit cell
+	iwrap=0,
 
-		! Constant pressure control.
-		barostat=1,    ! Berendsen barostat... change to 2 for MC
-		ntp=3,         ! 1=isotropic, 2=anisotropic, 3=semi-isotropic w/ surften
-		pres0=1.0,     ! Target external pressure, in bar
-		taup=1.0,
+	! Constant pressure control.
+	barostat=1,    ! Berendsen barostat... change to 2 for MC
+	ntp=3,         ! 1=isotropic, 2=anisotropic, 3=semi-isotropic w/ surften
+	pres0=1.0,     ! Target external pressure, in bar
+	taup=1.0,
 
-		! Constant surface tension (needed for semi-isotropic scaling). Uncomment
-		! for this feature. csurften must be nonzero if ntp=3 above
-		csurften=3,    ! Interfaces in 1=yz plane, 2=xz plane, 3=xy plane
-		gamma_ten=0.0, ! Surface tension (dyne/cm). 0 gives pure semi-iso scaling
-		ninterface=2,  ! Number of interfaces (2 for bilayer)
+	! Constant surface tension (needed for semi-isotropic scaling). Uncomment
+	! for this feature. csurften must be nonzero if ntp=3 above
+	csurften=3,    ! Interfaces in 1=yz plane, 2=xz plane, 3=xy plane
+	gamma_ten=0.0, ! Surface tension (dyne/cm). 0 gives pure semi-iso scaling
+	ninterface=2,  ! Number of interfaces (2 for bilayer)
 
-		! Set water atom/residue names for SETTLE recognition
-		watnam='WAT',  ! Water residues are named WAT
-		owtnm='O',     ! Water oxygens are named O
-	 /
+	! Set water atom/residue names for SETTLE recognition
+	watnam='WAT',  ! Water residues are named WAT
+	owtnm='O',     ! Water oxygens are named O
+ /
 
 EOF
 	
@@ -524,56 +524,56 @@ EOF
 
     # Production script
     cat <<EOF > Traj${traj}/004.prod/production.in
-	A NPT simulation for common production-level simulations
-	 &cntrl
-		imin=0,        ! No minimization
-		irest=1,       ! This IS a restart of an old MD simulation
-		ntx=5,         ! So our inpcrd file has velocities
+A NPT simulation for common production-level simulations
+ &cntrl
+	imin=0,        ! No minimization
+	irest=1,       ! This IS a restart of an old MD simulation
+	ntx=5,         ! So our inpcrd file has velocities
 
-		! Temperature control
-		ntt=3,         ! Langevin dynamics
-		gamma_ln=1.0,  ! Friction coefficient (ps^-1)
-		temp0=310,   ! Target temperature
+	! Temperature control
+	ntt=3,         ! Langevin dynamics
+	gamma_ln=1.0,  ! Friction coefficient (ps^-1)
+	temp0=310,     ! Target temperature
 
-		! Potential energy control
-		cut=9.0,       ! nonbonded cutoff, in Angstroms
+	! Potential energy control
+	cut=9.0,       ! nonbonded cutoff, in Angstroms
 
-		! MD settings
-		nstlim=5000000,! 10 ns total
-		dt=0.002,      ! time step (ps)
+	! MD settings
+	nstlim=5000000,! 10 ns total
+	dt=0.002,      ! time step (ps)
 
-		! SHAKE
-		ntc=2,         ! Constrain bonds containing hydrogen
-		ntf=2,         ! Do not calculate forces of bonds containing hydrogen
+	! SHAKE
+	ntc=2,         ! Constrain bonds containing hydrogen
+	ntf=2,         ! Do not calculate forces of bonds containing hydrogen
 
-		! Control how often information is printed
-		ntpr=20000,    ! Print energies every 10000 steps
-		ntwx=10000,    ! Print coordinates every 50000 steps to the trajectory
-		ntwr=2500000,  ! Print a restart file every 2500K steps (can be less frequent)
-	!   ntwv=-1,       ! Uncomment to also print velocities to trajectory
-	!   ntwf=-1,       ! Uncomment to also print forces to trajectory
-		ntxo=2,        ! Write NetCDF format
-		ioutfm=1,      ! Write NetCDF format (always do this!)
+	! Control how often information is printed
+	ntpr=20000,    ! Print energies every 10000 steps
+	ntwx=10000,    ! Print coordinates every 50000 steps to the trajectory
+	ntwr=2500000,  ! Print a restart file every 2500K steps (can be less frequent)
+!   ntwv=-1,       ! Uncomment to also print velocities to trajectory
+!   ntwf=-1,       ! Uncomment to also print forces to trajectory
+	ntxo=2,        ! Write NetCDF format
+	ioutfm=1,      ! Write NetCDF format (always do this!)
 
-		! Wrap coordinates when printing them to the same unit cell
-		iwrap=1,
+	! Wrap coordinates when printing them to the same unit cell
+	iwrap=1,
 
-		! Constant pressure control.
-		barostat=1,    ! Berendsen barostat... change to 2 for MC
-		ntp=3,         ! 1=isotropic, 2=anisotropic, 3=semi-isotropic w/ surften
-		pres0=1.0,     ! Target external pressure, in bar
-		taup=1.0,
+	! Constant pressure control.
+	barostat=1,    ! Berendsen barostat... change to 2 for MC
+	ntp=3,         ! 1=isotropic, 2=anisotropic, 3=semi-isotropic w/ surften
+	pres0=1.0,     ! Target external pressure, in bar
+	taup=1.0,
 
-		! Constant surface tension (needed for semi-isotropic scaling). Uncomment
-		! for this feature. csurften must be nonzero if ntp=3 above
-		csurften=3,    ! Interfaces in 1=yz plane, 2=xz plane, 3=xy plane
-		gamma_ten=0.0, ! Surface tension (dyne/cm). 0 gives pure semi-iso scaling
-		ninterface=2,  ! Number of interfaces (2 for bilayer)
+	! Constant surface tension (needed for semi-isotropic scaling). Uncomment
+	! for this feature. csurften must be nonzero if ntp=3 above
+	csurften=3,    ! Interfaces in 1=yz plane, 2=xz plane, 3=xy plane
+	gamma_ten=0.0, ! Surface tension (dyne/cm). 0 gives pure semi-iso scaling
+	ninterface=2,  ! Number of interfaces (2 for bilayer)
 
-		! Set water atom/residue names for SETTLE recognition
-		watnam='WAT',  ! Water residues are named WAT
-		owtnm='O',     ! Water oxygens are named O
-	 /
+	! Set water atom/residue names for SETTLE recognition
+	watnam='WAT',  ! Water residues are named WAT
+	owtnm='O',     ! Water oxygens are named O
+ /
 EOF
 	
     echo "" >> Traj${traj}/004.prod/production.in
